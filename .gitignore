@@ -17,3 +17,9 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+.DS_Store
+*.log
+/tests/.output
+/coverage
+/.tmp
+docs/install-media-server.sh
