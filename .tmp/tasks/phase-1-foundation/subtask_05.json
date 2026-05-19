@@ -1,0 +1,38 @@
+{
+  "id": "phase-1-foundation-05",
+  "seq": "05",
+  "title": "Password Reset (backend + frontend)",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Implemented Password Reset feature: backend controller + notification + Blade email template + forgot/reset React pages + routes + SPA URL config",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "app/Models/User.php",
+    "routes/api.php"
+  ],
+  "reference_files": [
+    "app/Http/Controllers/AuthController.php"
+  ],
+  "acceptance_criteria": [
+    "POST /api/v1/auth/forgot-password sends email with reset link",
+    "POST /api/v1/auth/reset-password resets password with valid token",
+    "Frontend pages: forgot password form, reset password form",
+    "Password reset email is sent with proper template",
+    "Token expires after use/timeout"
+  ],
+  "deliverables": [
+    "App/Http/Controllers/Auth/PasswordResetController.php",
+    "Updated routes/api.php",
+    "New resources/js/ui/pages/ForgotPasswordPage.jsx",
+    "New resources/js/ui/pages/ResetPasswordPage.jsx",
+    "Password reset notification template",
+    "Updated App.jsx with new routes"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

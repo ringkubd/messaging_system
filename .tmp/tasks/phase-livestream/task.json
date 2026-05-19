@@ -1,0 +1,22 @@
+{
+  "id": "phase-livestream",
+  "name": "Live Streaming Module",
+  "status": "active",
+  "objective": "Add live streaming capability: RTMP ingest, HLS playback, stream management, and viewer experience.",
+  "context_files": [
+    "routes/api.php",
+    "app/Models/Event.php"
+  ],
+  "reference_files": [],
+  "exit_criteria": [
+    "Live streams can be created with stream keys",
+    "Streamers can start/stop broadcasts via API",
+    "Viewers can watch live streams via HLS player",
+    "Admin can manage all streams",
+    "Server setup guide documented"
+  ],
+  "subtask_count": 1,
+  "completed_count": 1,
+  "created_at": "2026-05-19T00:00:00Z",
+  "completed_at": null
+}

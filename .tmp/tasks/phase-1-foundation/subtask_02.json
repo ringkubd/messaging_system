@@ -1,0 +1,28 @@
+{
+  "id": "phase-1-foundation-02",
+  "seq": "02",
+  "title": "Extended Profiles (user_profiles table, model, API)",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T12:00:00Z",
+  "completed_at": "2026-05-19T12:30:00Z",
+  "completion_summary": "Extended User Profiles: migration, model, controller, routes, and ProfilePage professional section",
+  "depends_on": ["01"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["app/Models/User.php", "database/migrations/2014_10_12_000000_create_users_table.php"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "user_profiles migration created with gender, dob, blood_group, address, phone, linkedin, github, portfolio, bio, experience, certifications, projects columns",
+    "User hasOne UserProfile relationship defined",
+    "UserProfile belongsTo User relationship defined",
+    "API endpoints for GET/PUT profile exist",
+    "JSON columns for experience, certifications, projects cast properly"
+  ],
+  "deliverables": [
+    "database/migrations/YYYY_MM_DD_HHMMSS_create_user_profiles_table.php",
+    "app/Models/UserProfile.php",
+    "App/Http/Controllers/UserProfileController.php",
+    "Updated routes/api.php with profile endpoints"
+  ]
+}

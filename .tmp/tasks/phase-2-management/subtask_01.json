@@ -1,0 +1,10 @@
+{
+  "id": "phase-2-management-01",
+  "seq": "01",
+  "title": "Events Module (CRUD, registration, QR)",
+"status": "completed",
+"agent_id": "coder-agent",
+"started_at": "2026-05-19T00:00:00Z",
+"completed_at": "2026-05-19T00:00:00Z",
+"completion_summary": "Implemented Events Module: migrations, models, controller with CRUD+QR, routes, frontend pages"
+}

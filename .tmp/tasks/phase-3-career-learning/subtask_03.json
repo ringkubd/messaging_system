@@ -1,0 +1,25 @@
+{
+  "id": "phase-3-career-learning-03",
+  "seq": "03",
+  "title": "Resume Builder",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["app/Models/UserProfile.php", "app/Models/User.php"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Uses existing user profile, user_profiles, experience, certifications, projects, skills data",
+    "Provides a structured resume view/export page",
+    "Frontend: step-by-step editor to fill missing fields, arrange sections",
+    "Export as printable HTML page"
+  ],
+  "deliverables": [
+    "resources/js/ui/pages/ResumePage.jsx",
+    "Updated profile endpoints if needed"
+  ],
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Created Resume Builder with GET /api/v1/resume endpoint, ResumePage.jsx with editor/preview modes, routes, and print support"
+}

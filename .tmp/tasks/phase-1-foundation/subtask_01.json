@@ -1,0 +1,26 @@
+{
+  "id": "phase-1-foundation-01",
+  "seq": "01",
+  "title": "Profile Edit API + Frontend",
+  "status": "in_progress",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["app/Models/User.php", "routes/api.php"],
+  "reference_files": ["app/Http/Controllers/MeController.php", "resources/js/ui/pages/ProfilePage.jsx"],
+  "acceptance_criteria": [
+    "PUT /api/v1/me endpoint for updating profile exists",
+    "Profile page has editable fields (name, bio, avatar)",
+    "Avatar upload works with file preview",
+    "Changes persist on reload"
+  ],
+  "deliverables": [
+    "App/Http/Controllers/ProfileController.php",
+    "Updated routes/api.php with PUT /me endpoint",
+    "Updated resources/js/ui/pages/ProfilePage.jsx with edit mode",
+    "Avatar upload component or integration"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

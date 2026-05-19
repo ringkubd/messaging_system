@@ -1,0 +1,37 @@
+{
+  "id": "phase-1-foundation-04",
+  "seq": "04",
+  "title": "Group Chat UI Frontend",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Group Chat UI: tabs, create modal with avatar/name/description/member picker, group window with real-time messaging, typing indicators, presence, file upload, and add members feature",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "app/Http/Controllers/ChatGroupController.php",
+    "app/Http/Controllers/GroupMessageController.php",
+    "routes/api.php",
+    "resources/js/ui/pages/ChatsPage.jsx"
+  ],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Group chat list visible in chats page with a 'Groups' section",
+    "Create group modal with name, description, member selection",
+    "Group chat window shows messages with sender avatars",
+    "Send messages, typing indicators, read state work in groups",
+    "Add/remove members from group UI",
+    "Group avatar upload works"
+  ],
+  "deliverables": [
+    "Updated resources/js/ui/pages/ChatsPage.jsx with group sections",
+    "New GroupChatWindow.jsx component",
+    "New CreateGroupModal.jsx component",
+    "Group management UI component"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

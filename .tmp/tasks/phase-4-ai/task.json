@@ -1,0 +1,19 @@
+{
+  "id": "phase-4-ai",
+  "name": "Phase 4 — AI & Advanced Features",
+  "status": "active",
+  "objective": "Integrate Ollama-powered AI features: content moderation, feed ranking, chatbot, resume analysis, and smart tagging for the ISDB-BISEW Connect platform.",
+  "context_files": [],
+  "reference_files": [],
+  "exit_criteria": [
+    "AI content moderation flags/reviews toxic posts and comments",
+    "Smart feed algorithm ranks posts by engagement and recency",
+    "AI chatbot answers FAQs about scholarship, platform, events",
+    "Resume AI analysis extracts skills and matches with jobs",
+    "Smart tagging auto-categorizes posts and resources"
+  ],
+  "subtask_count": 5,
+  "completed_count": 5,
+  "created_at": "2026-05-19T00:00:00Z",
+  "completed_at": null
+}

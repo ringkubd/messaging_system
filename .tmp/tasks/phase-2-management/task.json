@@ -1,0 +1,28 @@
+{
+  "id": "phase-2-management",
+  "name": "Phase 2 — Management & Events",
+  "status": "active",
+  "objective": "Build event management, announcements/CMS, scholarship management, attendance tracking, admin dashboard expansion, and audit log UI for the ISDB-BISEW Connect platform.",
+  "context_files": [
+    "routes/api.php",
+    "app/Http/Controllers/Admin/DashboardController.php",
+    "resources/js/ui/pages/AdminPage.jsx"
+  ],
+  "reference_files": [
+    "app/Models/User.php",
+    "app/Http/Controllers/PostController.php",
+    "resources/js/ui/pages/FeedPage.jsx"
+  ],
+  "exit_criteria": [
+    "Events can be created, listed, viewed, registered for with QR codes",
+    "Announcements and notices are manageable from admin panel",
+    "Scholarship programs, batches, and institutions are manageable",
+    "Attendance can be tracked via QR scan with batch-wise reports",
+    "Admin dashboard shows engagement graphs, event stats, batch performance",
+    "Audit log is searchable and filterable with better UX"
+  ],
+  "subtask_count": 6,
+  "completed_count": 2,
+  "created_at": "2026-05-19T00:00:00Z",
+  "completed_at": null
+}

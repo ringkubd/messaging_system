@@ -1,0 +1,33 @@
+{
+  "id": "phase-1-foundation-06",
+  "seq": "06",
+  "title": "Email Verification",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Email verification: MustVerifyEmail on User, AuthController verify/resend, VerifyEmail notification+blade, VerifyEmail/VerifyNotice pages, App.jsx public routes and unverified check",
+  "depends_on": ["05"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "app/Models/User.php",
+    "app/Http/Controllers/AuthController.php"
+  ],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "User model implements MustVerifyEmail contract",
+    "Email verification notification is sent on registration",
+    "Verify email route and frontend page exist",
+    "Resend verification email endpoint works",
+    "Unverified users have limited access (redirect to verify page)",
+    "Email verified at timestamp is set correctly"
+  ],
+  "deliverables": [
+    "Updated app/Models/User.php implements MustVerifyEmail",
+    "Updated routes/api.php with verification endpoints",
+    "New VerifyEmailPage.jsx frontend page",
+    "Updated AuthController register method",
+    "Email verification notification template"
+  ]
+}

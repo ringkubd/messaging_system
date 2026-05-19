@@ -1,0 +1,35 @@
+{
+  "id": "phase-2-management-03",
+  "seq": "03",
+  "title": "Scholarship Management (batches, institutions)",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Implemented Scholarship Management: migrations, models, admin CRUD controllers, public dropdown endpoints, routes, and AdminPage.jsx tabs",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["app/Models/User.php", "routes/api.php"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Scholarships table with name, description, start_date, end_date, status",
+    "Batches table with name, scholarship_id, institution_id, start_date, end_date",
+    "Institutions table with name, code, address, status",
+    "Admin API: CRUD for all three",
+    "Admin UI: manage scholarships, batches, institutions",
+    "Student filtering by batch/scholarship/institution"
+  ],
+  "deliverables": [
+    "database/migrations for scholarships, batches, institutions tables",
+    "app/Models/Scholarship.php, Batch.php, Institution.php",
+    "app/Http/Controllers/Admin/ScholarshipController.php",
+    "app/Http/Controllers/Admin/BatchController.php",
+    "app/Http/Controllers/Admin/InstitutionController.php",
+    "routes/api.php (admin routes)",
+    "Updated AdminPage.jsx with scholarship management tabs"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

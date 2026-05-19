@@ -1,0 +1,31 @@
+{
+  "id": "phase-3-career-learning-01",
+  "seq": "01",
+  "title": "Resource Hub (files, categorization, search, ratings)",
+  "status": "in_progress",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["routes/api.php", "app/Services/FileUploadService.php"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Resources table with title, description, type, file_url, category, tags, user_id, download_count, avg_rating",
+    "API: CRUD resources, download tracking, ratings, search by title/tags/category",
+    "Upload PDF/video/notes with file size/type validation",
+    "Frontend: resource library page with category filters, search, grid view",
+    "Resource detail page with download, rating, bookmark"
+  ],
+  "deliverables": [
+    "database/migrations/..._create_resources_table.php",
+    "database/migrations/..._create_resource_categories_table.php",
+    "app/Models/Resource.php",
+    "app/Models/ResourceCategory.php",
+    "app/Http/Controllers/ResourceController.php",
+    "routes/api.php",
+    "resources/js/ui/pages/ResourcesPage.jsx",
+    "resources/js/ui/pages/ResourceDetailPage.jsx"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

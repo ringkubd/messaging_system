@@ -1,0 +1,30 @@
+{
+  "id": "phase-5-scale-01",
+  "seq": "01",
+  "title": "Gamification System (badges, points, leaderboards)",
+  "status": "in_progress",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": ["app/Models/User.php"],
+  "acceptance_criteria": [
+    "Badges table with name, icon, description, criteria, points",
+    "User badges pivot table tracking awarded badges",
+    "Points system awards points for: post (10), comment (5), reaction received (2), login streak (3/day), group join (15), event attend (20), job applied (10)",
+    "Leaderboard: weekly, monthly, all-time rankings",
+    "Frontend: badges display on profile, leaderboard page"
+  ],
+  "deliverables": [
+    "database/migrations for badges, user_badges, user_points tables",
+    "app/Models/Badge.php",
+    "app/Services/GamificationService.php",
+    "app/Http/Controllers/LeaderboardController.php",
+    "routes/api.php",
+    "resources/js/ui/pages/LeaderboardPage.jsx",
+    "Updated ProfilePage.jsx with badges display"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

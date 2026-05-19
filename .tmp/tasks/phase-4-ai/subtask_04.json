@@ -1,0 +1,30 @@
+{
+  "id": "phase-4-ai-04",
+  "seq": "04",
+  "title": "Resume AI Analysis (skill extraction + job matching)",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": null,
+  "depends_on": [
+    "01"
+  ],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "app/Services/OllamaService.php"
+  ],
+  "acceptance_criteria": [
+    "Uploaded resumes are parsed for skills via Ollama",
+    "Extracted skills stored on user profile",
+    "Job matching: suggest jobs matching user's skills",
+    "Admin can view skill-gap analysis"
+  ],
+  "deliverables": [
+    "app/Jobs/AIResumeAnalysis.php",
+    "Updated JobController with skill-matching endpoint",
+    "Updated ProfilePage with AI skill suggestions"
+  ],
+  "completed_at": "2026-05-19T11:46:46.309Z",
+  "completion_summary": "Implemented Resume AI Analysis: AIResumeAnalysis job, resume upload/analyze endpoint, job matching with match scores, admin skill-gap analytics, and frontend updates for Profile, Jobs, and Admin pages"
+}

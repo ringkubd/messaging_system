@@ -1,0 +1,27 @@
+{
+  "id": "phase-3-career-learning-06",
+  "seq": "06",
+  "title": "Global Search (Meilisearch)",
+  "status": "pending",
+  "depends_on": ["01", "02"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Meilisearch installed and configured",
+    "Users, posts, groups, jobs, resources indexed",
+    "Global search endpoint returns results from all indexed entities",
+    "Frontend: search bar in navbar, results page with entity tabs"
+  ],
+  "deliverables": [
+    "composer.json update (meilisearch-php)",
+    "config/scout.php configuration",
+    "Model Scout implementations for indexed models",
+    "Search controller + endpoint",
+    "Search UI component/page"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

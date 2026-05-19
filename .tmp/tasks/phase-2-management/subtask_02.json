@@ -1,0 +1,33 @@
+{
+  "id": "phase-2-management-02",
+  "seq": "02",
+  "title": "Announcements/CMS (notices, banners)",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["routes/api.php", "resources/js/ui/pages/AdminPage.jsx"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Announcements table migration with title, body, type, audience, published_at, created_by",
+    "API: CRUD announcements (admin), list active (all users)",
+    "Frontend: notice board on dashboard, admin announcement management page",
+    "Banner management for homepage",
+    "Pin/unpin announcements"
+  ],
+  "deliverables": [
+    "database/migrations/2026_05_19_150000_create_announcements_table.php",
+    "app/Models/Announcement.php",
+    "app/Http/Controllers/AnnouncementController.php",
+    "app/Http/Controllers/Admin/AnnouncementController.php",
+    "routes/api.php (new routes)",
+    "Updated DashboardPage.jsx with notice board",
+    "Updated AdminPage.jsx with announcement management",
+    "Updated resources/css/app.css with notice board styles"
+  ],
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Announcements/CMS module implemented: migration, model, public+admin controllers, routes, dashboard notice board, admin management UI with CRUD/pin/publish"
+}

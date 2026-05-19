@@ -1,0 +1,28 @@
+{
+  "id": "phase-4-ai-02",
+  "seq": "02",
+  "title": "Smart Feed Algorithm (engagement-based ranking)",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Created FeedRankingService, updated PostController with smart sort, added reaction breakdowns, updated FeedPage with Smart tab and friend indicator",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["app/Http/Controllers/PostController.php"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Feed posts ranked by: recency, reaction count, comment count, user connections",
+    "New 'Trending' sort option on feed",
+    "Configurable algorithm weights stored in settings"
+  ],
+  "deliverables": [
+    "Updated PostController index method with smart ranking",
+    "Trending toggle on FeedPage.jsx",
+    "App/Services/FeedRankingService.php"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

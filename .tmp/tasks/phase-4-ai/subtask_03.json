@@ -1,0 +1,31 @@
+{
+  "id": "phase-4-ai-03",
+  "seq": "03",
+  "title": "AI Chatbot Assistant (Ollama-powered FAQ)",
+  "status": "completed",
+  "depends_on": [
+    "01"
+  ],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "app/Services/OllamaService.php"
+  ],
+  "acceptance_criteria": [
+    "Chatbot API endpoint that answers scholarship/platform FAQs",
+    "Uses Ollama with RAG context (FAQs data injected into prompt)",
+    "Frontend chat bubble UI in corner of app",
+    "Conversation history stored per user"
+  ],
+  "deliverables": [
+    "app/Http/Controllers/ChatbotController.php",
+    "app/Models/ChatbotConversation.php",
+    "resources/js/ui/components/ChatbotWidget.jsx",
+    "routes/api.php",
+    "database/migrations for chatbot_conversations table"
+  ],
+  "started_at": null,
+  "completed_at": "2026-05-19T11:44:49.420Z",
+  "completion_summary": "Implemented AI Chatbot: backend controller+model+migration, frontend widget with floating chat bubble, system prompt with 10 FAQs"
+}

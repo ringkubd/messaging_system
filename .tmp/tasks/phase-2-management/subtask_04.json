@@ -1,0 +1,31 @@
+{
+  "id": "phase-2-management-04",
+  "seq": "04",
+  "title": "Attendance Tracking (QR scan, reports)",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Implemented attendance tracking: QR check-in, attendance report/stats endpoints, admin UI with event detail/QR scan/filters, and attendance dashboard with batch/top-events charts",
+  "depends_on": ["01"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": ["app/Http/Controllers/EventController.php"],
+  "acceptance_criteria": [
+    "QR code generation on event registration",
+    "Admin QR scanner page to check-in attendees",
+    "Attendance report: event-wise, batch-wise, date range",
+    "Real-time attendance count on event detail"
+  ],
+  "deliverables": [
+    "Updated EventRegistration model with check-in timestamp",
+    "Admin QR scan check-in endpoint",
+    "Attendance report controller + endpoints",
+    "QR scanner UI page for admin",
+    "Attendance report UI"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

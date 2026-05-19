@@ -1,0 +1,31 @@
+{
+  "id": "phase-1-foundation-07",
+  "seq": "07",
+  "title": "Email Notifications",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Email notifications: Added mail channel with ShouldQueue, email preference migration, updated listeners/controllers",
+  "depends_on": ["06"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "app/Notifications/InAppActivityNotification.php",
+    "config/mail.php"
+  ],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Mail configuration is set up in .env",
+    "MailChannel added to relevant notifications (via, comment, friend request)",
+    "Email templates exist for each notification type",
+    "Users can toggle email notification preferences",
+    "Emails are queued (not sent synchronously)"
+  ],
+  "deliverables": [
+    "Updated app/Notifications/InAppActivityNotification.php with mail channel",
+    "New notification blade templates",
+    "Updated notification_preferences migration to add email toggles",
+    "Queue configuration for mail"
+  ],
+}

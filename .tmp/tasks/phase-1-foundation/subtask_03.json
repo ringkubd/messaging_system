@@ -1,0 +1,41 @@
+{
+  "id": "phase-1-foundation-03",
+  "seq": "03",
+  "title": "Post Edit/Delete API + Frontend",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-05-19T00:00:00Z",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Implemented Post and Comment Edit/Delete with full CRUD backend and frontend",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "app/Models/Post.php",
+    "app/Models/Comment.php",
+    "app/Http/Controllers/PostController.php",
+    "app/Http/Controllers/CommentController.php"
+  ],
+  "reference_files": [
+    "routes/api.php"
+  ],
+  "acceptance_criteria": [
+    "PUT /api/v1/posts/{post} endpoint exists and validates ownership",
+    "DELETE /api/v1/posts/{post} endpoint exists and validates ownership",
+    "PUT /api/v1/comments/{comment} endpoint exists and validates ownership",
+    "DELETE /api/v1/comments/{comment} endpoint exists and validates ownership",
+    "Frontend shows edit/delete buttons on own posts and comments",
+    "Edit opens inline editor, delete shows confirmation",
+    "Posts/comments properly soft-deleted or hard-deleted"
+  ],
+  "deliverables": [
+    "Updated app/Http/Controllers/PostController.php (update, destroy methods)",
+    "Updated app/Http/Controllers/CommentController.php (update, destroy methods)",
+    "Updated routes/api.php",
+    "Updated FeedPage.jsx with edit/delete UI",
+    "Updated post card and comment components"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

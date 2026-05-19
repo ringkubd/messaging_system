@@ -1,0 +1,31 @@
+{
+  "id": "phase-1-foundation",
+  "name": "Phase 1 — Foundation Completion",
+  "status": "active",
+  "objective": "Close critical gaps in the existing ISDB-BISEW Connect platform: profile editing, extended profiles, post edit/delete, group chat UI, password reset, email verification, email notifications, and dark mode.",
+  "context_files": [
+    ".opencode/skills/task-management/SKILL.md",
+    "composer.json",
+    "package.json"
+  ],
+  "reference_files": [
+    "app/Models/User.php",
+    "routes/api.php",
+    "resources/js/ui/App.jsx",
+    "resources/js/ui/pages/ProfilePage.jsx"
+  ],
+  "exit_criteria": [
+    "Users can edit their profile (name, bio, photo, contact)",
+    "Extended user_profiles table has correct columns and relations",
+    "Posts and comments can be edited and deleted by their authors",
+    "Group chat has a working React UI",
+    "Password reset flow works end-to-end",
+    "Email verification is enabled and functional",
+    "Email notifications are sent for key events",
+    "Dark mode toggle works and persists preference"
+  ],
+  "subtask_count": 8,
+  "completed_count": 8,
+  "created_at": "2026-05-19T00:00:00Z",
+  "completed_at": null
+}

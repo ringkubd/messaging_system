@@ -1,0 +1,32 @@
+{
+  "id": "phase-1-foundation-08",
+  "seq": "08",
+  "title": "Dark Mode",
+  "status": "completed",
+  "completed_at": "2026-05-19T00:00:00Z",
+  "completion_summary": "Dark mode implemented: ThemeContext with localStorage+prefers-color-scheme, CSS variable overrides in .dark class, toggle button in sidebar footer, dark: Tailwind class mode enabled",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "resources/js/ui/App.jsx",
+    "resources/css/app.css"
+  ],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Theme context provider wraps the app",
+    "Dark mode CSS variables defined",
+    "Toggle button in navbar/user menu works",
+    "Preference persisted in localStorage",
+    "Respects system preference (prefers-color-scheme) on first visit",
+    "All existing components render correctly in dark mode"
+  ],
+  "deliverables": [
+    "New ThemeContext.jsx or ThemeProvider component",
+    "Updated resources/css/app.css with dark mode variables",
+    "Theme toggle component",
+    "Updated App.jsx with theme provider",
+    "All pages/components updated for dark mode support"
+  ],
+  "started_at": "2026-05-19T00:00:00Z"
+}

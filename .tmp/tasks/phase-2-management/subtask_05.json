@@ -1,0 +1,26 @@
+{
+  "id": "phase-2-management-05",
+  "seq": "05",
+  "title": "Admin Dashboard Expansion",
+  "status": "pending",
+  "depends_on": ["01", "02", "03"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["app/Http/Controllers/Admin/DashboardController.php", "resources/js/ui/pages/AdminPage.jsx"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "New dashboard widgets: user growth chart, event participation, batch performance, engagement metrics",
+    "Data endpoints for chart data (daily/weekly/monthly)",
+    "Interactive charts on admin dashboard",
+    "Export reports to PDF/CSV"
+  ],
+  "deliverables": [
+    "Updated DashboardController with new metric endpoints",
+    "New chart components (or use simple canvas/SVG)",
+    "Updated AdminPage.jsx with charts and widgets",
+    "Report export endpoint"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": null
+}

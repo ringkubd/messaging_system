@@ -1,0 +1,31 @@
+{
+  "id": "phase-3-career-learning-02",
+  "seq": "02",
+  "title": "Job & Career Portal (jobs, applications, companies)",
+  "status": "completed",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": ["routes/api.php", "app/Models/User.php"],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Jobs table with title, company, description, type, location, salary_range, deadline, status, created_by",
+    "Job applications table with job_id, user_id, status, cover_letter, resume_url",
+    "Companies table with name, logo, description, website, industry",
+    "API: CRUD jobs, apply, list applications, update application status",
+    "Frontend: job listing page with filters, job detail, apply form",
+    "My applications page for students, posted jobs for recruiters"
+  ],
+  "deliverables": [
+    "database/migrations for jobs, job_applications, companies tables",
+    "app/Models/Job.php, JobApplication.php, Company.php",
+    "app/Http/Controllers/JobController.php",
+    "routes/api.php",
+    "resources/js/ui/pages/JobsPage.jsx",
+    "resources/js/ui/pages/JobDetailPage.jsx",
+    "resources/js/ui/pages/MyApplicationsPage.jsx"
+  ],
+  "started_at": null,
+  "completed_at": null,
+  "completion_summary": "Implemented Job & Career Portal with migrations, models, controllers, routes, and frontend pages"
+}

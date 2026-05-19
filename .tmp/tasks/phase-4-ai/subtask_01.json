@@ -1,0 +1,29 @@
+{
+  "id": "phase-4-ai-01",
+  "seq": "01",
+  "title": "AI Content Moderation (Ollama toxicity/spam detection)",
+  "status": "completed",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Ollama HTTP client service created in Laravel",
+    "Post/comment creation triggers async moderation via queue",
+    "Toxic/spam content auto-flagged, hidden from public feed",
+    "Admin AI moderation queue to review flagged content",
+    "Reports auto-categorized by AI severity"
+  ],
+  "deliverables": [
+    "app/Services/OllamaService.php",
+    "app/Jobs/AIModerateContent.php",
+    "config/ollama.php",
+    "Updated Post/Comment controllers with moderation hook",
+    "Admin AI moderation tab",
+    "New migration for moderation flags"
+  ],
+  "started_at": "2026-05-19T14:00:00Z",
+  "completed_at": "2026-05-19T14:30:00Z",
+  "completion_summary": "Implemented AI content moderation: created OllamaService, AIModerateContent job, migration for moderation fields, Post/Comment controller hooks, ModerationController, and React AdminModeration tab"
+}
