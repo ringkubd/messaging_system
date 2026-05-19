@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CallRoomController;
 use App\Http\Controllers\ChatGroupController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommunityController;
@@ -65,6 +66,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/forgot-password', [PasswordResetController::class, 'sendResetLink']);
     Route::post('/auth/reset-password', [PasswordResetController::class, 'reset']);
     Route::get('/auth/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail']);
+
+    // SRS/Nginx on_publish webhook (called by streaming server, no auth)
+    Route::get('/live-streams/auth-stream', [LiveStreamController::class, 'authStream']);
+    Route::get('/live-streams/end-stream', [LiveStreamController::class, 'endStreamByKey']);
 });
 
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {

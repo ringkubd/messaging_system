@@ -152,4 +152,42 @@ class LiveStreamController extends Controller
 
         return response()->json($streams);
     }
+
+    // Called by SRS/nginx RTMP on_publish hook (no auth middleware)
+    public function authStream(Request $request): \Illuminate\Http\Response
+    {
+        $key = $request->query('key') ?: $request->input('name');
+        $stream = LiveStream::where('stream_key', $key)
+            ->where('status', 'scheduled')
+            ->first();
+
+        if (!$stream) {
+            return response('Stream not found or not scheduled', 403);
+        }
+
+        $stream->update([
+            'status' => 'live',
+            'started_at' => now(),
+        ]);
+
+        return response('OK', 200);
+    }
+
+    // Called by SRS/nginx when stream ends
+    public function endStreamByKey(Request $request): \Illuminate\Http\Response
+    {
+        $key = $request->query('key') ?: $request->input('name');
+        $stream = LiveStream::where('stream_key', $key)
+            ->where('status', 'live')
+            ->first();
+
+        if ($stream) {
+            $stream->update([
+                'status' => 'ended',
+                'ended_at' => now(),
+            ]);
+        }
+
+        return response('OK', 200);
+    }
 }
