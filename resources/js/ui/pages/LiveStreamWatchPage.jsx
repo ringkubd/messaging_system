@@ -28,9 +28,12 @@ function formatDate(dateStr) {
 function HlsPlayer({ hlsUrl, poster }) {
     const videoRef = React.useRef(null);
     const [playerError, setPlayerError] = React.useState(false);
+    const [waiting, setWaiting] = React.useState(true);
 
     React.useEffect(() => {
         let hls = null;
+        let retries = 0;
+        const maxRetries = 30;
         const video = videoRef.current;
         if (!video) return;
 
@@ -43,11 +46,19 @@ function HlsPlayer({ hlsUrl, poster }) {
                     hls.attachMedia(video);
                     hls.on(Hls.Events.ERROR, (event, data) => {
                         if (data.fatal) {
-                            setPlayerError(true);
+                            retries++;
+                            if (retries >= maxRetries) {
+                                setPlayerError(true);
+                            }
                         }
+                    });
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        setWaiting(false);
+                        video.play();
                     });
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                     video.src = hlsUrl;
+                    setWaiting(false);
                 } else {
                     setPlayerError(true);
                 }
@@ -58,20 +69,38 @@ function HlsPlayer({ hlsUrl, poster }) {
 
         initPlayer();
 
-        return () => {
-            if (hls) {
-                hls.destroy();
+        const waitTimer = setTimeout(() => {
+            if (waiting && !playerError) {
+                setPlayerError(true);
             }
+        }, 60000);
+
+        return () => {
+            if (hls) hls.destroy();
+            clearTimeout(waitTimer);
         };
     }, [hlsUrl]);
+
+    if (waiting && !playerError) {
+        return (
+            <div className="stream-player-placeholder">
+                <div className="spinner-wrap"><div className="spinner" /></div>
+                <div className="stream-waiting-message">
+                    <div className="empty-state-icon" style={{ fontSize: '2rem', marginBottom: 8 }}>⏳</div>
+                    <div className="empty-state-text">Waiting for stream...</div>
+                    <div className="empty-state-sub">The streamer hasn't started broadcasting yet. The player will load automatically when the stream begins.</div>
+                </div>
+            </div>
+        );
+    }
 
     if (playerError) {
         return (
             <div className="stream-player-placeholder">
                 <div className="empty-state">
                     <div className="empty-state-icon">📺</div>
-                    <div className="empty-state-text">Player unavailable</div>
-                    <div className="empty-state-sub">Try opening the stream URL directly in a video player.</div>
+                    <div className="empty-state-text">Stream offline</div>
+                    <div className="empty-state-sub">The streamer has ended or hasn't started broadcasting. Check back later.</div>
                 </div>
                 <div className="stream-direct-link">
                     <a href={hlsUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm">
