@@ -11,7 +11,7 @@ set -euo pipefail
 
 SCRIPT_VERSION="2.0.0"
 LIVEKIT_VERSION="1.8.6"
-SRS_VERSION="v5.0.154"
+SRS_VERSION="v5.0-r3"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; BOLD='\033[1m'; NC='\033[0m'
 info()  { echo -e "${GREEN}[INFO]${NC}  $*"; }

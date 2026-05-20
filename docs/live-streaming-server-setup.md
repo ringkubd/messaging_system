@@ -91,7 +91,7 @@ sudo systemctl enable --now livekit
 ```bash
 # Compile from source (no Docker)
 sudo apt install -y automake autoconf libtool patch
-git clone --depth 1 -b v5.0.154 https://github.com/ossrs/srs.git /tmp/srs
+git clone --depth 1 -b v5.0-r3 https://github.com/ossrs/srs.git /tmp/srs
 cd /tmp/srs/trunk
 ./configure --prefix=/usr/local/srs --disable-all --with-ssl --with-hls \
     --with-http-server --with-http-callback --with-http-api
