@@ -6,7 +6,7 @@ import { useUIStore } from '@/_stores/ui-store';
 import { useAuthStore } from '@/_stores/auth-store';
 import {
   LayoutDashboard, FileText, Calendar, Video, Users2, BookOpen,
-  Briefcase, GraduationCap, MessageCircle, ChevronLeft, ChevronRight,
+  Briefcase, GraduationCap, MessageCircle, Bell, ChevronLeft, ChevronRight,
   Shield, Settings, Activity, ClipboardList, Building2, ScrollText,
 } from 'lucide-react';
 
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/resources', label: 'Resources', icon: BookOpen },
   { href: '/jobs', label: 'Jobs', icon: Briefcase },
   { href: '/alumni', label: 'Alumni', icon: GraduationCap },
+  { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/chat', label: 'Chats', icon: MessageCircle },
 ];
 
