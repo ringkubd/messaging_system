@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Event extends Model
 {
@@ -35,6 +36,15 @@ class Event extends Model
         'end_date' => 'datetime',
         'max_participants' => 'integer',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Event $event) {
+            if (!$event->slug) {
+                $event->slug = Str::slug($event->title) . '-' . Str::random(6);
+            }
+        });
+    }
 
     public function creator(): BelongsTo
     {
