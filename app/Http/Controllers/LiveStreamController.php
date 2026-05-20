@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LiveStream;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class LiveStreamController extends Controller
 {
@@ -51,6 +52,9 @@ class LiveStreamController extends Controller
 
         $liveStream = LiveStream::create($data);
         $liveStream->load('creator:id,name');
+
+        // Create LiveKit room for browser-based streaming
+        $this->createLiveKitRoom($liveStream);
 
         return response()->json($liveStream, 201);
     }
@@ -151,6 +155,112 @@ class LiveStreamController extends Controller
             ->paginate(20);
 
         return response()->json($streams);
+    }
+
+    public function generateToken(Request $request, LiveStream $liveStream): JsonResponse
+    {
+        if ($request->user()->id !== $liveStream->created_by && !$request->user()->isAdmin()) {
+            if ($liveStream->status !== 'live') {
+                return response()->json(['message' => 'Forbidden.'], 403);
+            }
+        }
+
+        $mode = $request->input('mode', 'publish');
+        $canPublish = $mode === 'publish' && $request->user()->id === $liveStream->created_by;
+
+        $apiKey = config('livestream.livekit.api_key');
+        $apiSecret = config('livestream.livekit.api_secret');
+        $wsUrl = config('livestream.livekit.ws_url');
+
+        if (!$apiKey || !$apiSecret) {
+            return response()->json(['message' => 'LiveKit not configured.'], 500);
+        }
+
+        $user = $request->user();
+        $now = time();
+        $payload = [
+            'iss' => $apiKey,
+            'sub' => $apiKey,
+            'aud' => 'livekit',
+            'iat' => $now,
+            'exp' => $now + 7200,
+            'nbf' => $now,
+            'jti' => $liveStream->stream_key . '-' . $user->id . '-' . $now,
+            'video' => [
+                'room' => $liveStream->stream_key,
+                'roomJoin' => true,
+                'roomList' => true,
+                'roomRecord' => false,
+                'roomCreate' => false,
+                'canPublish' => $canPublish,
+                'canSubscribe' => true,
+                'canPublishData' => true,
+            ],
+            'name' => $user->name,
+            'identity' => (string) $user->id,
+            'metadata' => json_encode([
+                'user_id' => $user->id,
+                'name' => $user->name,
+            ]),
+        ];
+
+        $token = $this->encodeJwt($payload, $apiSecret);
+
+        return response()->json([
+            'token' => $token,
+            'ws_url' => $wsUrl,
+            'room' => $liveStream->stream_key,
+        ]);
+    }
+
+    private function encodeJwt(array $payload, string $secret): string
+    {
+        $header = self::base64UrlEncode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
+        $payloadStr = self::base64UrlEncode(json_encode($payload));
+        $signature = self::base64UrlEncode(
+            hash_hmac('sha256', "{$header}.{$payloadStr}", $secret, true)
+        );
+        return "{$header}.{$payloadStr}.{$signature}";
+    }
+
+    private static function base64UrlEncode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    private function createLiveKitRoom(LiveStream $liveStream): void
+    {
+        $apiUrl = config('livestream.livekit.host');
+        $apiKey = config('livestream.livekit.api_key');
+        $apiSecret = config('livestream.livekit.api_secret');
+
+        if (!$apiUrl || !$apiKey || !$apiSecret) {
+            return;
+        }
+
+        try {
+            $token = $this->encodeJwt([
+                'iss' => $apiKey,
+                'sub' => $apiKey,
+                'aud' => 'livekit',
+                'iat' => time(),
+                'exp' => time() + 300,
+                'video' => ['roomCreate' => true, 'roomList' => true, 'roomAdmin' => true],
+            ], $apiSecret);
+
+            Http::withToken($token)
+                ->timeout(5)
+                ->post("{$apiUrl}/twirp/livekit.RoomService/CreateRoom", [
+                    'name' => $liveStream->stream_key,
+                    'max_participants' => $liveStream->max_viewers ?? 50,
+                    'empty_timeout' => 600,
+                ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('LiveKit create room failed', [
+                'stream' => $liveStream->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     // Called by SRS/nginx RTMP on_publish hook (no auth middleware)

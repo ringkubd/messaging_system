@@ -18,6 +18,7 @@
     "dependencies": {
         "hls.js": "^1.6.16",
         "laravel-echo": "^2.3.4",
+        "livekit-client": "^2.19.0",
         "pusher-js": "^8.5.0"
     }
 }

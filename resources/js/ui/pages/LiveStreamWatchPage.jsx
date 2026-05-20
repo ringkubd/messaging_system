@@ -4,6 +4,7 @@ import { SectionState, useApiData, relativeTime } from './common';
 import Badge from '../components/Badge';
 import Card from '../components/Card';
 import Spinner from '../components/Spinner';
+import Modal from '../components/Modal';
 import { useToast } from '../components/Toast';
 
 const STATUS_VARIANTS = {
@@ -16,299 +17,262 @@ const STATUS_VARIANTS = {
 function formatDate(dateStr) {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+        weekday: 'long', month: 'long', day: 'numeric',
+        year: 'numeric', hour: '2-digit', minute: '2-digit',
     });
 }
 
-function HlsPlayer({ hlsUrl, poster }) {
+function LiveKitPlayer({ token, wsUrl, isPublisher, onStreamReady }) {
     const videoRef = React.useRef(null);
-    const [playerError, setPlayerError] = React.useState(false);
-    const [waiting, setWaiting] = React.useState(true);
+    const [status, setStatus] = React.useState('connecting');
+    const roomRef = React.useRef(null);
 
     React.useEffect(() => {
-        let hls = null;
-        let retries = 0;
-        const maxRetries = 30;
-        const video = videoRef.current;
-        if (!video) return;
+        let room = null;
+        let mounted = true;
 
-        async function initPlayer() {
+        async function start() {
+            const { Room, RoomEvent, VideoPresets } = await import('livekit-client');
+            room = new Room({
+                adaptiveStream: true,
+                dynacast: true,
+                videoCaptureDefaults: { resolution: VideoPresets.h720.resolution },
+            });
+            roomRef.current = room;
+
+            room.on(RoomEvent.Disconnected, () => {
+                if (mounted) setStatus('disconnected');
+            });
+
+            room.on(RoomEvent.MediaDevicesError, () => {
+                if (mounted) setStatus('error');
+            });
+
             try {
-                const Hls = (await import('hls.js')).default;
-                if (Hls.isSupported()) {
-                    hls = new Hls();
-                    hls.loadSource(hlsUrl);
-                    hls.attachMedia(video);
-                    hls.on(Hls.Events.ERROR, (event, data) => {
-                        if (data.fatal) {
-                            retries++;
-                            if (retries >= maxRetries) {
-                                setPlayerError(true);
-                            }
+                await room.connect(wsUrl, token);
+
+                if (isPublisher) {
+                    // Streamer: publish camera + mic
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true,
+                    });
+                    stream.getTracks().forEach(track => {
+                        room.localParticipant.publishTrack(track, { simulcast: true });
+                    });
+                    if (mounted) {
+                        setStatus('live');
+                        if (onStreamReady) onStreamReady();
+                    }
+                } else {
+                    // Viewer: wait for remote tracks
+                    room.on(RoomEvent.TrackSubscribed, (track, participant) => {
+                        if (!mounted || !videoRef.current) return;
+                        if (track.kind === 'video' || track.kind === 'audio') {
+                            const el = track.attach();
+                            videoRef.current.innerHTML = '';
+                            videoRef.current.appendChild(el);
+                            if (mounted) setStatus('playing');
                         }
                     });
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        setWaiting(false);
-                        video.play();
+
+                    room.on(RoomEvent.ParticipantDisconnected, () => {
+                        if (mounted) setStatus('disconnected');
                     });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = hlsUrl;
-                    setWaiting(false);
-                } else {
-                    setPlayerError(true);
+
+                    // If no remote participant after 15s, show waiting
+                    setTimeout(() => {
+                        if (mounted && room.remoteParticipants.size === 0) {
+                            setStatus('waiting');
+                        }
+                    }, 15000);
+
+                    if (mounted) setStatus('watching');
                 }
-            } catch {
-                setPlayerError(true);
+            } catch (err) {
+                console.error('LiveKit error:', err);
+                if (mounted) setStatus('error');
             }
         }
 
-        initPlayer();
-
-        const waitTimer = setTimeout(() => {
-            if (waiting && !playerError) {
-                setPlayerError(true);
-            }
-        }, 60000);
+        start();
 
         return () => {
-            if (hls) hls.destroy();
-            clearTimeout(waitTimer);
+            mounted = false;
+            if (room) {
+                room.disconnect();
+                roomRef.current = null;
+            }
         };
-    }, [hlsUrl]);
+    }, [token, wsUrl, isPublisher, onStreamReady]);
 
-    if (waiting && !playerError) {
+    if (status === 'connecting') {
         return (
             <div className="stream-player-placeholder">
                 <div className="spinner-wrap"><div className="spinner" /></div>
-                <div className="stream-waiting-message">
-                    <div className="empty-state-icon" style={{ fontSize: '2rem', marginBottom: 8 }}>⏳</div>
-                    <div className="empty-state-text">Waiting for stream...</div>
-                    <div className="empty-state-sub">The streamer hasn't started broadcasting yet. The player will load automatically when the stream begins.</div>
+                <div className="empty-state">
+                    <div className="empty-state-text">Connecting...</div>
                 </div>
             </div>
         );
     }
 
-    if (playerError) {
+    if (status === 'waiting' || status === 'disconnected') {
+        return (
+            <div className="stream-player-placeholder">
+                <div className="empty-state">
+                    <div className="empty-state-icon" style={{ fontSize: '2rem' }}>⏳</div>
+                    <div className="empty-state-text">Waiting for streamer...</div>
+                    <div className="empty-state-sub">The broadcaster hasn't started yet. The video will appear automatically.</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (status === 'error') {
         return (
             <div className="stream-player-placeholder">
                 <div className="empty-state">
                     <div className="empty-state-icon">📺</div>
                     <div className="empty-state-text">Stream offline</div>
-                    <div className="empty-state-sub">The streamer has ended or hasn't started broadcasting. Check back later.</div>
+                    <div className="empty-state-sub">Could not connect to the stream. The broadcaster may have ended the stream.</div>
                 </div>
-                <div className="stream-direct-link">
-                    <a href={hlsUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm">
-                        Open HLS URL
-                    </a>
+            </div>
+        );
+    }
+
+    if (isPublisher && status === 'live') {
+        return (
+            <div className="stream-publishing-indicator">
+                <div className="stream-player-wrap" style={{ background: '#000', minHeight: 360, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ textAlign: 'center', color: '#22c55e' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: 8 }}>🔴</div>
+                        <div style={{ fontWeight: 600 }}>You are live</div>
+                        <div className="text-sm text-muted">Broadcasting to viewers...</div>
+                    </div>
+                    <video ref={videoRef} style={{ display: 'none' }} />
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="stream-player-wrap">
-            <video
-                ref={videoRef}
-                className="stream-video"
-                controls
-                poster={poster}
-                autoPlay
-                playsInline
-            />
+        <div className="stream-player-wrap" style={{ background: '#000' }}>
+            <div ref={videoRef} className="stream-video" style={{ width: '100%', minHeight: 360 }} />
         </div>
     );
 }
 
-function StreamerPanel({ stream, onStart, onEnd, actionBusy }) {
-    const [copied, setCopied] = React.useState(false);
+function GoLiveModal({ stream, onClose }) {
+    const toast = useToast();
+    const [step, setStep] = React.useState('confirm');
+    const [token, setToken] = React.useState(null);
+    const [wsUrl, setWsUrl] = React.useState(null);
 
-    async function copyToClipboard(text) {
+    async function handleGoLive() {
+        setStep('starting');
         try {
-            await navigator.clipboard.writeText(text);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch {
-            /* clipboard may not be available */
+            // Start stream on backend
+            await window.axios.post(`/api/v1/live-streams/${stream.id}/start`);
+
+            // Get LiveKit token
+            const tokenRes = await window.axios.get(`/api/v1/live-streams/${stream.id}/token`);
+            setToken(tokenRes.data.token);
+            setWsUrl(tokenRes.data.ws_url);
+            setStep('live');
+        } catch (err) {
+            toast.error(err?.response?.data?.message || 'Failed to start stream');
+            setStep('confirm');
         }
     }
 
     return (
-        <Card className="streamer-panel">
-            <div className="card-header">
-                <span className="card-title">Streamer Controls</span>
-            </div>
-            <div className="stack-sm">
-                <div className="form-group">
-                    <label className="form-label">Stream Key</label>
-                    <div className="stream-copy-row">
-                        <code className="stream-key-text">{stream.stream_key}</code>
-                        <button className="btn btn-ghost btn-sm" onClick={() => copyToClipboard(stream.stream_key)} type="button">
-                            {copied ? 'Copied!' : 'Copy'}
+        <Modal onClose={onClose} title="Go Live" width="560px">
+            {step === 'confirm' && (
+                <div className="stack-md">
+                    <p>Your camera and microphone will be used to broadcast live.</p>
+                    <p className="text-sm text-muted">Ensure you have a stable internet connection. Recommended upload speed: 3+ Mbps.</p>
+                    <div className="flex gap-2" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+                        <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleGoLive}>
+                            Go Live Now
                         </button>
                     </div>
                 </div>
-                <div className="form-group">
-                    <label className="form-label">RTMP URL</label>
-                    <div className="stream-copy-row">
-                        <code className="stream-key-text">{stream.rtmp_url}</code>
-                        <button className="btn btn-ghost btn-sm" onClick={() => copyToClipboard(stream.rtmp_url)} type="button">
-                            {copied ? 'Copied!' : 'Copy'}
+            )}
+            {step === 'starting' && (
+                <div className="stack-md" style={{ textAlign: 'center', padding: '2rem' }}>
+                    <div className="spinner-wrap"><div className="spinner" /></div>
+                    <p>Starting your stream...</p>
+                </div>
+            )}
+            {step === 'live' && (
+                <div className="stack-md">
+                    <LiveKitPlayer
+                        token={token}
+                        wsUrl={wsUrl}
+                        isPublisher={true}
+                    />
+                    <div className="flex gap-2" style={{ justifyContent: 'flex-end' }}>
+                        <button className="btn btn-danger" onClick={async () => {
+                            await window.axios.post(`/api/v1/live-streams/${stream.id}/end`);
+                            onClose();
+                        }}>
+                            End Stream
                         </button>
                     </div>
                 </div>
-                <div className="form-group">
-                    <label className="form-label">HLS URL</label>
-                    <div className="stream-copy-row">
-                        <code className="stream-key-text">{stream.hls_url}</code>
-                        <button className="btn btn-ghost btn-sm" onClick={() => copyToClipboard(stream.hls_url)} type="button">
-                            {copied ? 'Copied!' : 'Copy'}
-                        </button>
-                    </div>
-                </div>
-
-                <div className="obs-instructions">
-                    <p className="text-sm" style={{ fontWeight: 600, marginBottom: 4 }}>OBS Configuration:</p>
-                    <ul className="text-sm text-muted" style={{ margin: 0, paddingLeft: '1.25rem' }}>
-                        <li>Open OBS Studio</li>
-                        <li>Go to Settings → Stream</li>
-                        <li>Service: Custom...</li>
-                        <li>Server: <code className="font-mono">{stream.rtmp_url}</code></li>
-                        <li>Stream Key: <code className="font-mono">{stream.stream_key}</code></li>
-                        <li>Click Apply &amp; Start Streaming</li>
-                    </ul>
-                </div>
-
-                <div className="stream-actions" style={{ marginTop: '0.5rem' }}>
-                    {stream.status === 'scheduled' && (
-                        <button
-                            className="btn btn-primary"
-                            onClick={onStart}
-                            disabled={actionBusy}
-                            type="button"
-                        >
-                            {actionBusy ? 'Starting...' : 'Start Stream'}
-                        </button>
-                    )}
-                    {stream.status === 'live' && (
-                        <button
-                            className="btn btn-danger"
-                            onClick={onEnd}
-                            disabled={actionBusy}
-                            type="button"
-                        >
-                            {actionBusy ? 'Ending...' : 'End Stream'}
-                        </button>
-                    )}
-                </div>
-            </div>
-        </Card>
+            )}
+        </Modal>
     );
-}
-
-function CountdownTimer({ targetDate }) {
-    const [remaining, setRemaining] = React.useState('');
-
-    React.useEffect(() => {
-        function tick() {
-            const diff = new Date(targetDate) - new Date();
-            if (diff <= 0) {
-                setRemaining('Starting soon...');
-                return;
-            }
-            const days = Math.floor(diff / 86400000);
-            const hours = Math.floor((diff % 86400000) / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
-            const parts = [];
-            if (days > 0) parts.push(`${days}d`);
-            if (hours > 0) parts.push(`${hours}h`);
-            parts.push(`${minutes}m`);
-            setRemaining(parts.join(' '));
-        }
-        tick();
-        const id = setInterval(tick, 60000);
-        return () => clearInterval(id);
-    }, [targetDate]);
-
-    return <span>{remaining}</span>;
 }
 
 export default function LiveStreamWatchPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const toast = useToast();
-    const [actionBusy, setActionBusy] = React.useState(false);
+    const [showGoLive, setShowGoLive] = React.useState(false);
     const [user, setUser] = React.useState(null);
+    const [token, setToken] = React.useState(null);
+    const [wsUrl, setWsUrl] = React.useState(null);
 
-    const {
-        loading,
-        error,
-        data: stream,
-        unauthorized,
-        reload,
-    } = useApiData(`/api/v1/live-streams/${id}`);
+    const { loading, error, data: stream, unauthorized, reload } = useApiData(`/api/v1/live-streams/${id}`);
 
     React.useEffect(() => {
         async function fetchUser() {
             try {
                 const res = await window.axios.get('/api/v1/me');
                 setUser(res.data);
-            } catch {
-                /* not authenticated */
-            }
+            } catch {}
         }
         fetchUser();
     }, []);
 
     const isStreamer = user && stream && user.id === stream.created_by;
 
-    async function handleStart() {
-        setActionBusy(true);
-        try {
-            await window.axios.post(`/api/v1/live-streams/${id}/start`);
-            toast.success('Stream is now live!');
-            reload();
-        } catch (err) {
-            toast.error(err?.response?.data?.message || 'Could not start stream.');
-        } finally {
-            setActionBusy(false);
-        }
-    }
-
-    async function handleEnd() {
-        setActionBusy(true);
-        try {
-            await window.axios.post(`/api/v1/live-streams/${id}/end`);
-            toast.success('Stream ended.');
-            reload();
-        } catch (err) {
-            toast.error(err?.response?.data?.message || 'Could not end stream.');
-        } finally {
-            setActionBusy(false);
-        }
-    }
-
-    const [pollStatus, setPollStatus] = React.useState(null);
-
+    // Auto-fetch LiveKit token for viewers when stream is live
     React.useEffect(() => {
         if (!stream || stream.status !== 'live') return;
-        const id = setInterval(async () => {
+        // Fetch viewer token
+        window.axios.get(`/api/v1/live-streams/${stream.id}/token?mode=subscribe`)
+            .then(res => {
+                setToken(res.data.token);
+                setWsUrl(res.data.ws_url);
+            })
+            .catch(() => {});
+    }, [stream]);
+
+    const [pollStatus, setPollStatus] = React.useState(null);
+    React.useEffect(() => {
+        if (!stream || stream.status !== 'live') return;
+        const interval = setInterval(async () => {
             try {
                 const res = await window.axios.get(`/api/v1/live-streams/${stream.id}/status`);
                 setPollStatus(res.data);
-                if (res.data.status === 'ended') {
-                    reload();
-                }
-            } catch {
-                /* ignore polling errors */
-            }
-        }, 10000);
-        return () => clearInterval(id);
+                if (res.data.status === 'ended') reload();
+            } catch {}
+        }, 15000);
+        return () => clearInterval(interval);
     }, [stream, reload]);
 
     if (loading || error || unauthorized) {
@@ -335,51 +299,39 @@ export default function LiveStreamWatchPage() {
     return (
         <div className="stream-detail-page">
             <div className="stream-detail-header">
-                {currentStatus === 'live' && (
-                    <div className="stream-player-section">
-                        <HlsPlayer hlsUrl={stream.hls_url} poster={stream.thumbnail_url} />
-                    </div>
-                )}
-                {currentStatus === 'ended' && (
-                    <div className="stream-ended-message">
-                        <div className="empty-state">
-                            <div className="empty-state-icon">📺</div>
-                            <div className="empty-state-text">This stream has ended</div>
-                            {stream.ended_at && (
-                                <div className="empty-state-sub">
-                                    Ended {relativeTime(stream.ended_at)}
-                                </div>
-                            )}
+                <div className="stream-player-section">
+                    {currentStatus === 'live' && token && wsUrl && (
+                        <LiveKitPlayer token={token} wsUrl={wsUrl} isPublisher={false} />
+                    )}
+                    {currentStatus === 'live' && !token && (
+                        <div className="stream-player-placeholder">
+                            <div className="spinner-wrap"><div className="spinner" /></div>
+                            <div className="empty-state-text">Connecting to stream...</div>
                         </div>
-                        {stream.thumbnail_url && (
-                            <div className="stream-thumbnail-preview">
-                                <img src={stream.thumbnail_url} alt={stream.title} />
+                    )}
+                    {currentStatus === 'ended' && (
+                        <div className="stream-ended-message">
+                            <div className="empty-state">
+                                <div className="empty-state-icon">📺</div>
+                                <div className="empty-state-text">This stream has ended</div>
+                                {stream.ended_at && (
+                                    <div className="empty-state-sub">Ended {relativeTime(stream.ended_at)}</div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                )}
-                {currentStatus === 'scheduled' && (
-                    <div className="stream-scheduled-message">
-                        <div className="empty-state">
-                            <div className="empty-state-icon">📅</div>
-                            <div className="empty-state-text">Stream Scheduled</div>
-                            {stream.scheduled_at && (
-                                <div className="empty-state-sub">
-                                    Starts {formatDate(stream.scheduled_at)}
-                                    <br />
-                                    <strong>
-                                        <CountdownTimer targetDate={stream.scheduled_at} />
-                                    </strong>
-                                </div>
-                            )}
                         </div>
-                        {stream.thumbnail_url && (
-                            <div className="stream-thumbnail-preview">
-                                <img src={stream.thumbnail_url} alt={stream.title} />
+                    )}
+                    {currentStatus === 'scheduled' && (
+                        <div className="stream-scheduled-message">
+                            <div className="empty-state">
+                                <div className="empty-state-icon">📅</div>
+                                <div className="empty-state-text">Stream Scheduled</div>
+                                {stream.scheduled_at && (
+                                    <div className="empty-state-sub">Starts {formatDate(stream.scheduled_at)}</div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                )}
+                        </div>
+                    )}
+                </div>
 
                 <div className="stream-info-section">
                     <div className="stream-info-badges">
@@ -387,10 +339,9 @@ export default function LiveStreamWatchPage() {
                             {currentStatus === 'live' && <span className="live-dot" style={{ marginRight: 4 }} />}
                             {currentStatus === 'live' ? 'LIVE' : currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
                         </Badge>
-                        {stream.event && (
-                            <Badge variant="default">{stream.event.title}</Badge>
-                        )}
+                        {stream.event && <Badge variant="default">{stream.event.title}</Badge>}
                     </div>
+
                     <h1>{stream.title}</h1>
 
                     <div className="stream-meta">
@@ -412,40 +363,41 @@ export default function LiveStreamWatchPage() {
                                 <span>{relativeTime(stream.started_at)}</span>
                             </div>
                         )}
-                        {stream.max_viewers && (
-                            <div className="stream-meta-item">
-                                <span className="stream-meta-label">Max Viewers</span>
-                                <span>{stream.max_viewers}</span>
-                            </div>
-                        )}
                     </div>
 
                     {stream.description && (
-                        <Card>
-                            <p style={{ whiteSpace: 'pre-wrap' }}>{stream.description}</p>
-                        </Card>
+                        <Card><p style={{ whiteSpace: 'pre-wrap' }}>{stream.description}</p></Card>
                     )}
 
-                    <div className="stream-actions" style={{ marginTop: '1rem' }}>
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => navigate('/live-streams')}
-                            type="button"
-                        >
+                    <div className="stream-actions" style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                        <button className="btn btn-secondary" onClick={() => navigate('/live-streams')} type="button">
                             ← Back to Streams
                         </button>
-                    </div>
 
-                    {isStreamer && (
-                        <StreamerPanel
-                            stream={stream}
-                            onStart={handleStart}
-                            onEnd={handleEnd}
-                            actionBusy={actionBusy}
-                        />
-                    )}
+                        {isStreamer && currentStatus === 'scheduled' && (
+                            <button className="btn btn-primary" onClick={() => setShowGoLive(true)} type="button">
+                                Go Live
+                            </button>
+                        )}
+                        {isStreamer && currentStatus === 'live' && (
+                            <button className="btn btn-danger" onClick={async () => {
+                                await window.axios.post(`/api/v1/live-streams/${id}/end`);
+                                toast.success('Stream ended');
+                                reload();
+                            }} type="button">
+                                End Stream
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
+
+            {showGoLive && (
+                <GoLiveModal
+                    stream={stream}
+                    onClose={() => { setShowGoLive(false); reload(); }}
+                />
+            )}
         </div>
     );
 }

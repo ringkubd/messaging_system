@@ -220,6 +220,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/live-streams/{liveStream}/start', [LiveStreamController::class, 'startStream']);
     Route::post('/live-streams/{liveStream}/end', [LiveStreamController::class, 'endStream']);
     Route::get('/live-streams/{liveStream}/status', [LiveStreamController::class, 'status']);
+    Route::get('/live-streams/{liveStream}/token', [LiveStreamController::class, 'generateToken']);
     Route::get('/my/streams', [LiveStreamController::class, 'myStreams']);
 
     // Audio/Video Call routes (LiveKit)
